@@ -1,4 +1,5 @@
 import requests
+import time
 
 BASE_URL = "https://musicbrainz.org/ws/2"
 METALLICA_ID = "65f4f0c5-ef9e-490c-aee3-909e7ae6b2ab"
@@ -6,6 +7,37 @@ METALLICA_ID = "65f4f0c5-ef9e-490c-aee3-909e7ae6b2ab"
 HEADERS = {
     "User-Agent": "MetallicaPythonApp/1.0"
 }
+
+def search_songs(song_name):
+    url = f"{BASE_URL}/recording"
+
+    params = {
+        "query": f'arid:{METALLICA_ID} AND recording:{song_name}',
+        "limit": 25,
+        "fmt": "json"
+    }
+
+    try:
+        response = requests.get(
+            url,
+            headers=HEADERS,
+            params=params,
+            timeout=10
+        )
+
+        response.raise_for_status()
+
+    except requests.Timeout:
+        print("MusicBrainz took too long to respond.")
+        return []
+
+    except requests.RequestException as error:
+        print(f"MusicBrainz API error: {error}")
+        return []
+
+    data = response.json()
+
+    return data.get("recordings", [])
 
 def get_albums():
     url = f"{BASE_URL}/release-group"
@@ -67,7 +99,24 @@ def main():
                 print(f"{date}: {album['title']}")
 
         elif choice == "2":
-            print("Song search!")
+            song_name = input("Enter song name: ")
+
+            songs = search_songs(song_name)
+
+            titles=[]
+            seen_titles = set()
+            if not songs:
+                print("No songs found.")
+            else:
+                for song in songs:
+                    title = song["title"]
+
+                    normalized_title = title.lower()
+                    if normalized_title not in seen_titles:
+                        seen_titles.add(normalized_title)
+                        titles.append(title)
+                for title in titles:
+                    print(title)
         elif choice == "3":
             print("Lyrics!")
         elif choice == "4":
