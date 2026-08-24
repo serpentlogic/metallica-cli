@@ -8,12 +8,45 @@ HEADERS = {
     "User-Agent": "MetallicaPythonApp/1.0"
 }
 
+LYRICS_URL = "https://lrclib.net/api/search"
+LYRICS_HEADERS = { "User-Agent": "MetallicaCLI/1.0"}
+
+def get_lyrics(song_name):
+    params = {
+        "track_name": song_name,
+        "artist_name": "Metallica"
+    }
+
+    try:
+        response = requests.get(
+            LYRICS_URL,
+            headers=LYRICS_HEADERS,
+            params=params,
+            timeout=10
+        )
+
+        response.raise_for_status()
+
+    except requests.Timeout:
+        print("Lyrics service took too long to respond.")
+        return None
+    except requests.RequestsException as error:
+        print(f"Lyrics API error: {error}")
+        return None
+
+    results = response.json()
+
+    if not results:
+        return None
+
+    return results
+
 def search_songs(song_name):
     url = f"{BASE_URL}/recording"
 
     params = {
-        "query": f'arid:{METALLICA_ID} AND recording:{song_name}',
-        "limit": 25,
+        "query": f'artist:"Metallica" AND recording:"{song_name}"',
+        "limit": 500,
         "fmt": "json"
     }
 
@@ -22,7 +55,7 @@ def search_songs(song_name):
             url,
             headers=HEADERS,
             params=params,
-            timeout=10
+            timeout=30
         )
 
         response.raise_for_status()
@@ -50,9 +83,14 @@ def get_albums():
         "inc": "artist-credits"
     }
 
-    response = requests.get(url, headers=HEADERS, params=params, timeout=10)
-    response.raise_for_status()
-    data = response.json()
+    try:
+        response = requests.get(url, headers=HEADERS, params=params, timeout=30)
+        response.raise_for_status()
+    except Exception as error:
+        print(f"Error getting albums: {error}")
+        return []
+    else:
+        data = response.json()
 
     return data["release-groups"]
 
@@ -100,7 +138,7 @@ def main():
 
         elif choice == "2":
             song_name = input("Enter song name: ")
-
+            print("\nSearching...please wait up to 30 seconds...\n")
             songs = search_songs(song_name)
 
             titles=[]
@@ -118,7 +156,52 @@ def main():
                 for title in titles:
                     print(title)
         elif choice == "3":
-            print("Lyrics!")
+            song_name = input("Enter song name: ")
+
+            results = get_lyrics(song_name)
+
+            if not results:
+                print("Lyrics not found.")
+                continue
+
+            # Keep exact title matches when possible
+            exact_matches = []
+
+            for result in results:
+                if result['trackName'].lower() == song_name.lower():
+                    exact_matches.append(result)
+
+            if exact_matches:
+                results = exact_matches
+
+            print("\nMatches: ")
+
+            for index, result in enumerate(results[:5], start=1):
+                print(
+                    f"{index}. {result['trackName']} "
+                    f"- {result['albumName']}"
+                )
+
+            selection = input('\nChoose recording: ')
+
+            try:
+                index = int(selection) - 1
+                result = results[index]
+            except (ValueError, IndexError):
+                print("Invalid selection.")
+                continue
+
+
+            print(f"\n{result['trackName']}")
+            print(f"Album: {result['albumName']}")
+            print("-" * 40)
+
+            lyrics = result.get("plainLyrics")
+
+            if lyrics:
+                print(lyrics)
+            else:
+                print("No 'plain' lyrics available.")
         elif choice == "4":
             print("Setlists!")
         elif choice == "5":
