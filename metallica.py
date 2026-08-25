@@ -13,6 +13,19 @@ HEADERS = {
 LYRICS_URL = "https://lrclib.net/api/search"
 LYRICS_HEADERS = { "User-Agent": "MetallicaCLI/1.0"}
 
+
+def move_enemy(enemy_x, enemy_y, player_x, player_y):
+    if enemy_x < player_x:
+        enemy_x += 1
+    elif enemy_x > player_x:
+        enemy_x -= 1
+    elif enemy_y < player_y:
+        enemy_y += 1
+    elif enemy_y > player_y:
+        enemy_y -= 1
+
+    return enemy_x, enemy_y
+
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -42,6 +55,7 @@ def creeping_death():
         print("\n☠️ CREEPING DEATH ☠️ ")
         print(f"Souls: {collected}/{total_souls}\n")
         print(f"Turns: {turns}\n")
+        print("\nD = Creeping Death | @ = Soul | X = Holy Warrior")
 
         for y in range(height):
             for x in range(width):
@@ -83,6 +97,9 @@ def creeping_death():
             turns += 1
         else:
             print("You cannot leave this realm.")
+
+        if turns % 2 == 0:
+            enemy_x, enemy_y = move_enemy(enemy_x, enemy_y, player_x, player_y)
 
         if (player_x, player_y) == (enemy_x, enemy_y):
             print("\n☠ DEATH HAS BEEN BANISHED ☠")
