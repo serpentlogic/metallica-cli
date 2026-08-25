@@ -29,17 +29,26 @@ def creeping_death():
         (6, 4)
     }
 
+    total_souls = len(souls)
+
+    enemy_x = 6
+    enemy_y = 2
+
     collected = 0
+    turns = 0
 
     while True:
         clear_screen()
         print("\n☠️ CREEPING DEATH ☠️ ")
-        print(f"Souls: {collected}/3\n")
+        print(f"Souls: {collected}/{total_souls}\n")
+        print(f"Turns: {turns}\n")
 
         for y in range(height):
             for x in range(width):
-                if (x,y) == (player_x, player_y):
+                if (x, y) == (player_x, player_y):
                     print("D", end=" ")
+                elif (x, y) == (enemy_x, enemy_y):
+                    print("X", end=" ")
                 elif (x, y) in souls:
                     print("@", end=" ")
                 else:
@@ -71,8 +80,13 @@ def creeping_death():
         if 0 <= new_x < width and 0 <= new_y < height:
             player_x = new_x
             player_y = new_y
+            turns += 1
         else:
             print("You cannot leave this realm.")
+
+        if (player_x, player_y) == (enemy_x, enemy_y):
+            print("\n☠ DEATH HAS BEEN BANISHED ☠")
+            break
 
         if (player_x, player_y) in souls:
             souls.remove((player_x, player_y))
@@ -80,10 +94,11 @@ def creeping_death():
 
             print(" 💀 SOUL CLAIMED 💀")
 
-            if collected == 3:
+            if not souls:
                 print("\n 💀 ALL SOULS CLAIMED 💀")
                 print("CREEPING DEATH HAS CONQUERED LEVEL 1.")
                 break
+
 def get_lyrics(song_name):
     params = {
         "track_name": song_name,
@@ -103,7 +118,7 @@ def get_lyrics(song_name):
     except requests.Timeout:
         print("Lyrics service took too long to respond.")
         return None
-    except requests.RequestsException as error:
+    except requests.RequestException as error:
         print(f"Lyrics API error: {error}")
         return None
 
