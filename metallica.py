@@ -1,6 +1,7 @@
 import requests
 import time
 import random
+import os
 
 BASE_URL = "https://musicbrainz.org/ws/2"
 METALLICA_ID = "65f4f0c5-ef9e-490c-aee3-909e7ae6b2ab"
@@ -12,6 +13,8 @@ HEADERS = {
 LYRICS_URL = "https://lrclib.net/api/search"
 LYRICS_HEADERS = { "User-Agent": "MetallicaCLI/1.0"}
 
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 def creeping_death():
     width = 8
@@ -29,6 +32,7 @@ def creeping_death():
     collected = 0
 
     while True:
+        clear_screen()
         print("\n☠️ CREEPING DEATH ☠️ ")
         print(f"Souls: {collected}/3\n")
 
