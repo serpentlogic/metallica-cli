@@ -1,5 +1,6 @@
 import requests
 import time
+import random
 
 BASE_URL = "https://musicbrainz.org/ws/2"
 METALLICA_ID = "65f4f0c5-ef9e-490c-aee3-909e7ae6b2ab"
@@ -11,6 +12,74 @@ HEADERS = {
 LYRICS_URL = "https://lrclib.net/api/search"
 LYRICS_HEADERS = { "User-Agent": "MetallicaCLI/1.0"}
 
+
+def creeping_death():
+    width = 8
+    height = 6
+
+    player_x = 1
+    player_y = 1
+
+    souls = {
+        (5, 1),
+        (2, 4),
+        (6, 4)
+    }
+
+    collected = 0
+
+    while True:
+        print("\n☠️ CREEPING DEATH ☠️ ")
+        print(f"Souls: {collected}/3\n")
+
+        for y in range(height):
+            for x in range(width):
+                if (x,y) == (player_x, player_y):
+                    print("D", end=" ")
+                elif (x, y) in souls:
+                    print("@", end=" ")
+                else:
+                    print(".", end=" ")
+
+            print()
+
+        move = input("\nMove W/A/S/D (Q quits): ").lower()
+
+        if move == 'q':
+            print("Creeping Death retreats... for now.")
+            break
+
+        new_x = player_x
+        new_y = player_y
+
+        if move == "w":
+            new_y -= 1
+        elif move == "s":
+            new_y += 1
+        elif move == "a":
+            new_x -= 1
+        elif move == "d":
+            new_x += 1
+        else:
+            print("Invalid move.")
+            continue
+
+        if 0 <= new_x < width and 0 <= new_y < height:
+            player_x = new_x
+            player_y = new_y
+        else:
+            print("You cannot leave this realm.")
+
+        if (player_x, player_y) in souls:
+            souls.remove((player_x, player_y))
+            collected += 1
+
+            print(" 💀 SOUL CLAIMED 💀")
+
+            if collected == 3:
+                print("\n 💀 ALL SOULS CLAIMED 💀")
+                print("CREEPING DEATH HAS CONQUERED LEVEL 1.")
+                break
 def get_lyrics(song_name):
     params = {
         "track_name": song_name,
@@ -102,7 +171,8 @@ def show_menu():
     print("4. Concert setlists")
     print("5. Latest news")
     print("6. Random song")
-    print("7. Quit")
+    print("7. Creeping Death Mode")
+    print("8. Quit")
 
 
 def main():
@@ -209,6 +279,8 @@ def main():
         elif choice == "6":
             print("Random song!")
         elif choice == "7":
+            creeping_death()
+        elif choice == "8":
             print("Later! 🤘")
             break
         else:
