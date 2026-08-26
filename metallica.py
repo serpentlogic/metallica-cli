@@ -2,6 +2,8 @@ import requests
 import time
 import random
 import os
+import xml.etree.ElementTree as ET
+
 
 BASE_URL = "https://musicbrainz.org/ws/2"
 METALLICA_ID = "65f4f0c5-ef9e-490c-aee3-909e7ae6b2ab"
@@ -15,6 +17,48 @@ LYRICS_HEADERS = { "User-Agent": "MetallicaCLI/1.0"}
 
 SETLIST_URL = "https://api.setlist.fm/rest/1.0/search/setlists"
 SETLIST_API_KEY = os.getenv("SETLISTFM_API_KEY")
+
+NEWS_URL = 'https://news.google.com/rss/search'
+
+
+def get_latest_news():
+    params = {
+        'q': 'Metallica',
+        'hl': 'en-US',
+        'gl': 'US',
+        'ceid': 'US:en'
+    }
+
+    try:
+        response = requests.get(
+            NEWS_URL,
+            params=params,
+            timeout=10
+        )
+
+        response.raise_for_status()
+
+    except requests.Timeout:
+        print("News service took too long to respond.")
+        return []
+    except requests.RequestException as error:
+        print(f"News error: {error}")
+        return []
+
+    root = ET.fromstring(response.content)
+
+    articles = []
+
+    for item in root.findall(".//item"):
+        article = {
+            "title": item.findtext('title', 'Unknown title'),
+            'link': item.findtext('link', ''),
+            'date': item.findtext('pubDate', 'Unknown date')
+        }
+
+        articles.append(article)
+
+    return articles
 
 def get_setlists(city_name):
     if not SETLIST_API_KEY:
@@ -373,9 +417,21 @@ def main():
                     print(f"Source: {source}")
 
                 print()
-                
+
         elif choice == "5":
-            print("News!")
+            articles = get_latest_news()
+
+            if not articles:
+                print("No news found.")
+                continue
+
+            print("\n🤘 LATEST METALLICA NEWS 🤘\n")
+
+            for article in articles[:5]:
+                print(article['title'])
+                print(article['date'])
+                print(article['link'])
+                print('-' * 50)
         elif choice == "6":
             print("Random song!")
         elif choice == "7":
