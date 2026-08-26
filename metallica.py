@@ -13,6 +13,44 @@ HEADERS = {
 LYRICS_URL = "https://lrclib.net/api/search"
 LYRICS_HEADERS = { "User-Agent": "MetallicaCLI/1.0"}
 
+SETLIST_URL = "https://api.setlist.fm/rest/1.0/search/setlists"
+SETLIST_API_KEY = os.getenv("SETLISTFM_API_KEY")
+
+def get_setlists(city_name):
+    if not SETLIST_API_KEY:
+        print("SETLISTFM_API_KEY is not set.")
+        return []
+
+    headers = {
+        'Accept': "application/json",
+        'x-api-key': SETLIST_API_KEY
+    }
+
+    params = {
+        'artistMbid': METALLICA_ID,
+        'cityName': city_name
+    }
+
+    try:
+        response = requests.get(
+            SETLIST_URL,
+            headers=headers,
+            params=params,
+            timeout=10
+        )
+
+        response.raise_for_status()
+    except requests.Timeout:
+        print('setlist.fm took too long to respond.')
+        return []
+    except requests.RequestException as error:
+        print(f"Setlist API error:  {error}")
+        return []
+
+    data = response.json()
+
+    return data.get('setlist', [])
+
 
 def move_enemy(enemy_x, enemy_y, player_x, player_y):
     if enemy_x < player_x:
@@ -309,7 +347,33 @@ def main():
             else:
                 print("No 'plain' lyrics available.")
         elif choice == "4":
-            print("Setlists!")
+            city_name = input('Enter city: ')
+
+            shows = get_setlists(city_name)
+
+            if not shows:
+                print("No Metallica shows found.")
+                continue
+
+            print(f"\nMetallica shows in {city_name}:\n")
+
+            for show in shows[:5]:
+                date = show.get('eventDate', 'Unknown date')
+
+                venue = show.get('venue', {})
+                venue_name = venue.get('name', 'Unknown venue')
+
+                city = venue.get('city', {})
+                state = city.get('stateCode', '')
+
+                print(f"{date} - {venue_name} - {city_name} {state}")
+
+                source = show.get('url')
+                if source:
+                    print(f"Source: {source}")
+
+                print()
+                
         elif choice == "5":
             print("News!")
         elif choice == "6":
