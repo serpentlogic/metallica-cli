@@ -20,6 +20,49 @@ SETLIST_API_KEY = os.getenv("SETLISTFM_API_KEY")
 
 NEWS_URL = 'https://news.google.com/rss/search'
 
+def get_random_song():
+    url = f"{BASE_URL}/recording"
+
+    params = {
+        'query': f'arid:{METALLICA_ID}',
+        'limit': 100,
+        'fmt': 'json'
+    }
+
+    for attempt in range(2):
+        try:
+            response = requests.get(
+                url,
+                headers=HEADERS,
+                params=params,
+                timeout=30
+            )
+
+            response.raise_for_status()
+            break
+
+        except requests.Timeout:
+            print("MusicBrainz took too long to respond.")
+            return None
+
+        except requests.RequestException as error:
+            print(f"MusicBrainz API error: {error}")
+            return None
+
+        if attempt == 0:
+            print('Retrying...')
+            time.sleep(1)
+        else:
+            return None
+
+    data = response.json()
+
+    recordings = data.get('recordings', [])
+
+    if not recordings:
+        return None
+
+    return random.choice(recordings)
 
 def get_latest_news():
     params = {
@@ -433,7 +476,15 @@ def main():
                 print(article['link'])
                 print('-' * 50)
         elif choice == "6":
-            print("Random song!")
+            song = get_random_song()
+
+            if not song:
+                print('Could not find a random Metallica song.')
+                continue
+
+            print("\n🎲 RANDOM METALLICA SONG 🎲")
+            print(song.get('title', 'Unknown title'))
+
         elif choice == "7":
             creeping_death()
         elif choice == "8":
