@@ -43,11 +43,11 @@ def get_random_song():
 
         except requests.Timeout:
             print("MusicBrainz took too long to respond.")
-            return None
+            
 
         except requests.RequestException as error:
             print(f"MusicBrainz API error: {error}")
-            return None
+
 
         if attempt == 0:
             print('Retrying...')
