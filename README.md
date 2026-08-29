@@ -223,3 +223,4 @@ Metallica and related names are trademarks of their respective owners.
 
 Music and lyrics data remain the property of their respective rights holders.
 
+<img width="1672" height="941" alt="image" src="https://github.com/user-attachments/assets/4049746d-b318-42ff-a6ce-a3a6f813eaac" />
