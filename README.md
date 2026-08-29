@@ -1,4 +1,6 @@
-<img width="1448" height="1086" alt="Metallica-CLI-Graphic2" src="https://github.com/user-attachments/assets/95a9ecbd-ea56-4a57-9361-bab4bd5d56fc" />
+
+<img width="1672" height="941" alt="image" src="https://github.com/user-attachments/assets/49fcc018-b502-41b8-ae73-ee05618d27e5" />
+
 
 
 # Metallica CLI 🤘
