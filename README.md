@@ -168,6 +168,9 @@ The main menu looks similar to:
 
 Enter the number corresponding to the feature you want to use.
 
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/ccd0e924-32a6-41f7-a70f-877d88efc3d4" />
+
+
 ## Creeping Death Mode
 
 Creeping Death Mode is a small terminal game included with the application.
