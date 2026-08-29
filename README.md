@@ -65,6 +65,9 @@ https://news.google.com/
 
 The news feature reads Google's RSS news search feed and does not require an API key.
 
+<img width="1402" height="1122" alt="image" src="https://github.com/user-attachments/assets/5fc0d6b6-efe8-4646-bca8-34361c78c713" />
+
+
 ## Requirements
 
 * Python 3
