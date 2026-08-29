@@ -1,3 +1,5 @@
+<img width="1254" height="1254" alt="metallica-cli" src="https://github.com/user-attachments/assets/2fbd10ac-0a17-4fea-a7a0-0249922fd627" />
+
 # Metallica CLI 🤘
 
 A Python command-line Metallica app that uses several public APIs to explore albums, songs, lyrics, concert setlists, news, and more.
